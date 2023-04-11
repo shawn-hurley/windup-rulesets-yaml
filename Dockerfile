@@ -11,7 +11,7 @@ RUN go build -o windup-shim main.go
 # This is the container built from the Dockerfile in the analyzer-lsp project
 FROM analyzer-lsp
 
-RUN microdnf install git -y && git clone https://github.com/windup/windup-rulesets.git /windup-rulesets
+RUN microdnf install git -y && git clone -b bugfix/fix-java-filename https://github.com/shawn-hurley/windup-rulesets.git /windup-rulesets
 # run cp /analyzer-lsp/konveyor-analyzer /usr/local/bin/
 
 # TODO debug only

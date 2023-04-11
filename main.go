@@ -661,8 +661,14 @@ func convertWindupWhenToAnalyzer(windupWhen windup.When, where map[string]string
 	}
 	if windupWhen.Filecontent != nil {
 		for _, fc := range windupWhen.Filecontent {
+			query := strings.Replace(fc.Pattern, "(", `\(`, -1)
+			query = strings.Replace(query, ")", `\)`, -1)
+			query = substituteWhere(where, query)
+			query = strings.Replace(query, "{[", "[", -1)
+			query = strings.Replace(query, "]+}", "]+", -1)
+			query = strings.Replace(query, "{*}", "*", -1)
 			condition := map[string]interface{}{
-				"builtin.filecontent": strings.Replace(substituteWhere(where, fc.Pattern), "{*}", "*", -1),
+				"builtin.filecontent": query,
 			}
 			if fc.As != "" {
 				condition["as"] = fc.As
@@ -745,8 +751,9 @@ func convertWindupWhenToAnalyzer(windupWhen windup.When, where map[string]string
 					matches = strings.Replace(strings.Replace(matches, "windup:", "", -1), ns.Prefix+":", "", -1)
 				}
 			}
+			xpathString := strings.Replace(substituteWhere(where, matches), "{*}", "*", -1)
 			xmlCond := map[string]interface{}{
-				"xpath": substituteWhere(where, matches),
+				"xpath": xpathString,
 			}
 			// TODO We don't support regexes here, may need to break it out into a separate lookup that gets passed through
 			if xf.In != "" {
